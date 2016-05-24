@@ -61,7 +61,7 @@ function Popup () {
 
 
 $.extend(Popup.prototype, {
-    
+
     /**
      * 初始化完毕事件，在 show()、showModal() 执行
      * @name Popup.prototype.onshow
@@ -122,6 +122,9 @@ $.extend(Popup.prototype, {
     /** close 返回值 */
     returnValue: '',
 
+    /** 仿 Bootstrap 弹出层 **/
+    overscroll: false,
+
     /** 是否自动聚焦 */
     autofocus: true,
 
@@ -156,6 +159,18 @@ $.extend(Popup.prototype, {
 
         // 初始化 show 方法
         if (!this.__ready) {
+
+            //判断是否为全屏弹出层
+            if( this.overscroll ){
+                this.fixed = true;
+                $("body")
+                .css({overflow:"hidden"});
+                popup.css({
+                    width:'100%',
+                    height:'100%',
+                    overflowY:'scroll'
+                });
+            }
 
             popup
             .addClass(this.className)
@@ -236,24 +251,24 @@ $.extend(Popup.prototype, {
         this.modal = true;
         return this.show.apply(this, arguments);
     },
-    
-    
+
+
     /** 关闭浮层 */
     close: function (result) {
-        
+
         if (!this.destroyed && this.open) {
-            
+
             if (result !== undefined) {
                 this.returnValue = result;
             }
-            
+
             this.__popup.hide().removeClass(this.className + '-show');
             this.__backdrop.hide();
             this.open = false;
             this.blur();// 恢复焦点，照顾键盘操作的用户
             this.__dispatchEvent('close');
         }
-    
+
         return this;
     },
 
@@ -265,8 +280,12 @@ $.extend(Popup.prototype, {
             return this;
         }
 
+        if( this.overscroll ){
+            $("body").css('overflow', 'auto');
+        }
+
         this.__dispatchEvent('beforeremove');
-        
+
         if (Popup.current === this) {
             Popup.current = null;
         }
@@ -447,7 +466,7 @@ $.extend(Popup.prototype, {
 
     // 居中浮层
     __center: function () {
-    
+
         var popup = this.__popup;
         var $window = $(window);
         var $document = $(document);
@@ -462,18 +481,18 @@ $.extend(Popup.prototype, {
         var top = (wh - oh) * 382 / 1000 + dt;// 黄金比例
         var style = popup[0].style;
 
-        
+
         style.left = Math.max(parseInt(left), dl) + 'px';
         style.top = Math.max(parseInt(top), dt) + 'px';
     },
-    
-    
+
+
     // 指定位置 @param    {HTMLElement, Event}  anchor
     __follow: function (anchor) {
-        
+
         var $elem = anchor.parentNode && $(anchor);
         var popup = this.__popup;
-        
+
 
         if (this.__followSkin) {
             popup.removeClass(this.__followSkin);
@@ -487,7 +506,7 @@ $.extend(Popup.prototype, {
                 return this.__center();
             }
         }
-        
+
         var that = this;
         var fixed = this.fixed;
 
@@ -541,7 +560,7 @@ $.extend(Popup.prototype, {
             top: top + height / 2 - popupHeight / 2
         };
 
-        
+
         var range = {
             left: [minLeft, maxLeft],
             top: [minTop, maxTop]
@@ -573,7 +592,7 @@ $.extend(Popup.prototype, {
 
         //添加follow的css, 为了给css使用
         className += align.join('-') + ' '+ this.className+ '-follow';
-        
+
         that.__followSkin = className;
 
 
@@ -581,7 +600,7 @@ $.extend(Popup.prototype, {
             popup.addClass(className);
         }
 
-        
+
         css[name[align[0]]] = parseInt(temp[0][align[0]]);
         css[name[align[1]]] = parseInt(temp[1][align[1]]);
         popup.css(css);
@@ -603,7 +622,7 @@ $.extend(Popup.prototype, {
         anchor = isNode ? anchor : anchor.target;
         var ownerDocument = anchor.ownerDocument;
         var defaultView = ownerDocument.defaultView || ownerDocument.parentWindow;
-        
+
         if (defaultView == window) {// IE <= 8 只能使用两个等于号
             return offset;
         }
@@ -616,13 +635,13 @@ $.extend(Popup.prototype, {
         var frameOffset = $(frameElement).offset();
         var frameLeft = frameOffset.left;
         var frameTop = frameOffset.top;
-        
+
         return {
             left: offset.left + frameLeft - docLeft,
             top: offset.top + frameTop - docTop
         };
     }
-    
+
 });
 
 

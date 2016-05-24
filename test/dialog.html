@@ -32,12 +32,117 @@
 	.ui-popup-focus .ui-dialog {
 	    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 	}
+
+	.ui-scroll-dialog{
+		width: 400px;
+		height: 800px;
+		margin: 0 auto;
+		margin-top: 20px;
+		margin-bottom: 20px;
+		background: #FFF;
+		padding: 10px;
+		border: 1px solid #999;
+	}
 	</style>
 </head>
 <body>
 
 
-<button id="show">show dialog</button> <button id="showModal">show modalDialog</button>
+<button id="show">show dialog</button> <button id="showModal">show modalDialog</button>  <button id="scrollModal">show scrollDialog</button>
+<pre>
+artDialog
+artDialog——经典、优雅的网页对话框控件。 文档与示例：http://aui.github.io/artDialog/doc/index.html
+
+AngularJS 版本：https://github.com/aui/angular-popups
+
+成功案例
+
+超过 40 万网站在使用 artDialog，其中不乏国内顶尖的产品：
+
+QQ空间 v8（腾讯）
+Phpcms（盛大）
+极路由
+...
+更新历史
+
+6.0.4
+
+content()方法传入隐藏元素并显示，并且remove()的时候会将元素插入到body避免被销毁 #103 #126
+修复button方法可能会多次绑定事件的问题
+模态对话框可以避免 shift + tab 将焦点移出对话框 #67
+6.0.3
+
+修复button方法直接传入 html 不显示的问题
+修复版本管理导致#78重现问题
+6.0.2
+
+提供无依赖 seajs 与 requirejs 的版本
+取消按钮增加cancelDisplay配置，保留cancel事件的同时也不会显示取消按钮
+6.0.1
+
+进一步完善焦点管理，避免抢夺开发者自己设置的焦点#67
+修复对话框内容使用 html5 data-id 属性冲突的问题#78
+改善 Esc 快捷键与 cancel 的问题#36
+6.0.0
+
+功能增强：支持定义左下角的区域 HTML、支持 12 个方向的气泡对话框、支持无标题栏与按钮区的对话框
+更好的交互体验：更加先进的焦点管理，支持无障碍访问
+面向未来：基于 HTML5 Dialog 的 API
+模块化：支持 AMD、CMD 规范
+可选增强版：拖拽支持、简化框架页面调用
+授权协议
+
+免费，且开源，基于LGPL协议。
+
+-----------------------------------------------------------------------
+
+【artDialog4.1.0升级到4.1.1】
+1.	建议把这些参数名替换成新参数名，因为未来版本老参数名将不可用：
+	yesFn	> ok
+	noFn	> cancel
+	closeFn	> close
+	initFn	> init
+	yesText	> okVal
+	noText	> cancelVal
+
+
+
+【artDialog4.0.5升级到4.1.0】
+1.	tmpl参数被取消
+
+
+
+【artDialog4.0.0测试版升级到4.0.0正式版】
+
+1.	iframe拓展被单独剥离出来，需要另引用artDialog.iframeTools.js 或者把它合并到artDialog.js下面,
+	alert / confirm / prompt / open / load / tips / 等方法需要引用artDialog.iframeTools.js
+
+2.	iframeTools 内置art.dialog.through方法，如果自己根据文档写了此方法的同学请删除，否则会报错
+
+3.	压缩版文件名没有“min”做后缀，请注意下
+
+
+
+【artDialog3升级到4.0.0测试版】
+
+1.	art.dialog.get(id) 变更为 art.dialog.list[id]
+
+2.	不再支持多皮肤共存,css文件默认不自动加载：
+	需要在引用的脚步文件写url参数：artDialog.js?skin=default
+
+3.	不再支持页面载入即时弹出对话框, 而建议在
+	jQuery(function () {/* [code..] */})中或者window.onload中调用，否则页面会报错
+
+4.	不再支持iframe父子窗口自动注入artDialog文件：请给需要的框架页面引用artDialog相关文件
+
+5.	jQuery('#test').dialog({content: 'hello world'})方式将会自动绑定click事件
+
+
+6.	follow参数传入ID名称需要加#号，如 follow: '#myID' 如果传入元素对象则不用担心错误
+
+7.	left与top参数不再支持"left", "right", "center", "top", "bottom"这些关键字
+	请用"0%", "100%", "50%"代替
+</pre>
 <script src="../lib/sea.js"></script>
 <script>
 seajs.config({
@@ -79,8 +184,26 @@ seajs.use(['jquery', '../src/popup.js'], function ($, Popup) {
 		});
 	};
 
+	var scrollDialog = function () {
+		var popup = new Popup();
+		popup.innerHTML =
+		 '<div class="ui-scroll-dialog">'
+		+	'<p>hello world</p>'
+		+	'<button id="modalDialog-close">close</button>'
+		+'</div>';
+		popup.overscroll = true;
+		popup.showModal();
+
+		$('#modalDialog-close').one('click', function () {
+			popup.close().remove();
+		});
+	};
+
+
+
 	$('#show').on('click', dialog);
 	$('#showModal').on('click', modalDialog);
+	$('#scrollModal').on('click', scrollDialog);
 });
 </script>
 </body>
